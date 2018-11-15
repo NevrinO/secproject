@@ -1,0 +1,116 @@
+<!DOCTYPE html>	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="login/login.css">
+	<script>
+		$(document).ready(function(){
+			//Controls the dropdown of the login button
+			$('#login-trigger').click(function(){
+				$(this).next('#login-content').slideToggle();
+				$(this).toggleClass('active');          
+				
+				if ($('#signup-trigger').hasClass('active')){
+					$('#signup-trigger').find('span').html('&#x25BC;');
+					$('#signup-trigger').next('#signup-content').slideToggle();
+					$('#signup-trigger').toggleClass('active');
+				}
+				if ($(this).hasClass('active')) $(this).find('span').html('&#x25B2;')
+				else $(this).find('span').html('&#x25BC;')
+			})
+			//Controls the dropdown of the signup button
+			$('#signup-trigger').click(function(){
+				$(this).next('#signup-content').slideToggle();
+				$(this).toggleClass('active');   
+				
+				if ($('#login-trigger').hasClass('active')){
+					$('#login-trigger').find('span').html('&#x25BC;');
+					$('#login-trigger').next('#login-content').slideToggle();
+					$('#login-trigger').toggleClass('active');
+				}	
+				if ($(this).hasClass('active')) $(this).find('span').html('&#x25B2;')
+				else $(this).find('span').html('&#x25BC;')
+			})
+		});
+	</script>
+	<?php 
+		//this receives messages sent to it and creates an alert on which ever page login is loaded into.
+		//currently used for successful loggout and successful password change messages.
+		if (!empty($_GET['msg']))
+		{
+			echo "<script type=\"text/javascript\">
+			var loc = window.location.href;
+			var n = loc.indexOf('?');
+			loc = loc.substring(0, n != -1 ? n : s.length);
+			window.alert('". base64_decode(urldecode($_GET['msg'])) ."');
+			window.location.replace(loc);</script>";
+		}
+		//with the session_start() located here it should make it so that every page with this login system also maintains a session
+		//this means no page with this html loaded should have its own session_start()
+		//if they do this will create an error
+		session_start();
+		//if not logged in will load the login and signup dropdown menus
+		if(!isset($_SESSION['user']))
+		{
+			echo 	
+				'<nav>
+					<ul>
+						<li id="login">
+							<a id="login-trigger" href="#">
+								Log in <span>&#x25BC;</span>
+							</a>
+							<div id="login-content">
+								<form action="login/login.php" method="post">
+									<fieldset id="login-inputs">
+										<input type="hidden" name="op" value="login">
+										<input type="text" name="user" placeholder="Your email address" required>   
+										<input type="password" name="pass" placeholder="Password" required>
+									</fieldset>
+									<fieldset id="login-actions">
+										<input type="submit" id="submit" value="Log in">
+										<label><input type="checkbox" checked="checked"> Keep me signed in</label>
+									</fieldset>
+										<a href="#">Forgot Password?</a>
+								</form>
+							</div>                     
+						</li>
+						<li id="signup">
+							<a id="signup-trigger" href="#">Sign up <span>&#x25BC;</span></a>
+							<div id="signup-content">
+								<form action="login/login.php" method="post">
+									<fieldset id="signup-inputs">
+										<input type="hidden" name="op" value="new">
+										<input type="text" name="user" placeholder="Your email address" required>   
+										<input id="signup-password" type="password" name="pass" placeholder="Password" required>
+										<input id="signup-re-password" type="password" name="repass" placeholder="Re-enter Password" required>
+									</fieldset>
+									<fieldset id="signup-actions">
+										<input type="submit" id="signup-submit" value="Sign Up">
+										<label><a href="terms.html" target="_blank">Agree to Terms</a><input type="checkbox" id="terms"></label>
+									</fieldset>
+								</form>
+							</div>  
+						</li>
+					</ul>
+				</nav>';
+		}
+		//if already logged on will replace login menu with a button with user name that links to account page and also adds a logoff button
+		else{
+			$user=$_SESSION['user'];
+			echo
+				'<nav>
+					<ul>
+						<li id="logged-in">
+							<a class="text-capitalize" id="logged-user" href="account.php">
+								Hello '.$user.' 
+							</a>                     
+						</li>
+						<li id="logged-out">
+							<a id="logout" href="login/logout.php">Logout?</a>
+						</li>
+					</ul>
+				</nav>';
+		}
+	?>
+
+
+
+ 
